@@ -1,7 +1,35 @@
 # prensa_chile_py — Project Progress
 
 **Project:** Monitor Social @ UC Chile — Chilean news scraper (Python)
-**Started:** 2026-05-20 | **Last updated:** 2026-05-22 (Round 2 search audit)
+**Started:** 2026-05-20 | **Last updated:** 2026-05-27 (Google News → GNews library)
+
+---
+
+## 2026-05-27 — Google News backend switched to GNews library
+
+The previous `feedparser`-direct implementation hit HTTP 503 (IP-based rate limit) after the first scrape,
+making repeated runs unreliable.
+
+### What changed
+- `scraper/outlets/google_news.py` rewritten to use the **GNews** library (ranahaani/GNews).
+- Same underlying RSS mechanism but adds: Chile/Spanish targeting (`gl=CL`, `hl=es-419`), automatic
+  Google redirect URL resolution (removes the custom `_resolve_url` HEAD/GET workaround), and optional proxy support.
+- **Retry with exponential backoff**: 3 attempts per day-window fetch (5 → 15 → 30s + ±2s jitter).
+  Handles transient 503s without crashing the run.
+- **Polite inter-day delay**: 1–2.5s sleep between day-window calls.
+- **`fuente` now shows actual outlet name** (e.g. `"El Mostrador"`) instead of flat `"google_news"`.
+- **Proxy support**: set `$env:GNEWS_PROXY = "http://user:pass@host:port"` to route through a proxy
+  if Google blocks the IP persistently.
+- `gnews>=0.3.7` added to `requirements.txt`.
+
+### Files changed
+`scraper/outlets/google_news.py` (full rewrite), `requirements.txt`, `progress.md`
+
+### After update — install new dependency
+```powershell
+.venv\Scripts\Activate.ps1
+pip install gnews
+```
 
 ---
 
@@ -264,6 +292,15 @@ NoDate fix applied to elciudadano and meganoticias. OG meta → datetime attr �
 
 ### Priority 4 — DONE (2026-05-22)
 Parallelism, live progress (`--progress`), auto-report, README all implemented and verified.
+
+### Pending — UX improvements (2026-05-27)
+
+- **Dataset filenames**: current pattern `{slug}_{YYYYMMDD}_{HHMMSS}.csv` is hard to read at a glance — make them more descriptive/human-friendly (e.g. include query and date range).
+- **Prettier log output**: the plain `[INFO]` log format is hard to scan — improve formatting (colours, structured layout, or cleaner timestamp style).
+
+### Pending — Merging improvements (2026-05-27)
+
+-**Merge**: with the addition of google news, the merge is outdate. GN has a unique format that needs to be harmonised with the rest. The cuerpo and bajada seems part of the same, consider merging it. a recurrent problem is the recurrent names of the outlets in the cuerpo and bajada section,. They're dennoted the following way: [OutletName]. Was thinking of merging into the same column the cuerpo and bajada and definig the name of the outlet form the [] name
 
 ### Status: PRODUCTION READY (2026-05-22)
 All 15 outlets working. Parallel execution, live progress, auto-reports, and README in place.

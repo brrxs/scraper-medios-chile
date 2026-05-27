@@ -2,6 +2,7 @@ requests>=2.32.0
 beautifulsoup4>=4.12.0
 lxml>=5.3.0
 feedparser>=6.0.0
+gnews>=0.3.7
 pyarrow>=17.0.0
 playwright>=1.44.0
 rich>=13.0.0

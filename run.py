@@ -18,6 +18,7 @@ _REPORTS_DIR = Path(__file__).parent / "reports"
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
+    force=True,
     handlers=[
         logging.StreamHandler(sys.stdout),
         logging.FileHandler(_LOG_FILE, encoding="utf-8"),
@@ -32,10 +33,11 @@ logger = logging.getLogger(__name__)
 
 def _run_outlet(args: tuple) -> tuple[str, int, Optional[str]]:
     slug, queries, since, until, log_queue = args
-    root = logging.getLogger()
-    root.handlers.clear()
-    root.addHandler(logging.handlers.QueueHandler(log_queue))
-    root.setLevel(logging.INFO)
+    if multiprocessing.current_process().name != "MainProcess":
+        root = logging.getLogger()
+        root.handlers.clear()
+        root.addHandler(logging.handlers.QueueHandler(log_queue))
+        root.setLevel(logging.INFO)
     from scraper.outlets import REGISTRY as _REG
     try:
         scraper = _REG[slug]()
@@ -168,23 +170,22 @@ def _cmd_run(args):
     except Exception as e:
         logger.error(f"Pool error: {e}", exc_info=True)
     finally:
+        # Mark outlets that never completed
+        completed = {s for s, _, _ in results}
+        for slug in targets:
+            if slug not in completed:
+                results.append((slug, 0, "NOT RUN"))
+
+        elapsed = time.monotonic() - t0
+        _log_summary(results, elapsed)
+
+        from scraper.report import write_run_report
+        write_run_report(
+            results, since, until, args.query, _DATOS_DIR, _REPORTS_DIR, interrupted=interrupted
+        )
+
         listener.stop()
         manager.shutdown()
-
-    # Mark outlets that never completed
-    completed = {s for s, _, _ in results}
-    for slug in targets:
-        if slug not in completed:
-            results.append((slug, 0, "NOT RUN"))
-
-    elapsed = time.monotonic() - t0
-    _log_summary(results, elapsed)
-
-    # Auto-report
-    from scraper.report import write_run_report
-    write_run_report(
-        results, since, until, args.query, _DATOS_DIR, _REPORTS_DIR, interrupted=interrupted
-    )
 
 
 def _run_with_progress(
@@ -230,9 +231,11 @@ def _run_with_progress(
         return table
 
     def drain_queue():
+        root = logging.getLogger()
         while not log_queue.empty():
             try:
                 record = log_queue.get_nowait()
+                root.handle(record)
                 msg = record.getMessage()
                 for slug in targets:
                     if f"[{slug}]" not in msg:
