@@ -15,6 +15,16 @@ Documentación completa: [INSTRUCTIONS.md](app/INSTRUCTIONS.md)
 
 ---
 
+## Citar
+
+Si usas PressCL en tu investigación o trabajo, por favor cítalo:
+
+[![DOI](https://zenodo.org/badge/1259735009.svg)](https://doi.org/10.5281/zenodo.20563693)
+
+> Barrientos, T. (2026). *PressCL: Aplicación para buscar noticias en medios chilenos* (v0.3). Zenodo. https://doi.org/10.5281/zenodo.20563693
+
+---
+
 ## Descargas
 
 **Última versión: [PressCL v0.3](https://github.com/brrxs/PressCL/releases/tag/v0.3)**
