@@ -1,0 +1,27 @@
+============================================
+ Scraper de Prensa Chilena
+============================================
+
+REQUISITOS
+----------
+Necesitas tener Python instalado en tu computador.
+Si no lo tienes, descargalo desde:
+https://www.python.org/downloads/
+(versión 3.10 o superior, marcar la opción "Add Python to PATH")
+
+PRIMERA VEZ (instalación)
+--------------------------
+1. Hacer doble clic en setup.bat
+2. Esperar a que termine (puede tomar unos minutos)
+3. Listo, no es necesario repetir este paso
+
+ABRIR LA APP
+------------
+1. Hacer doble clic en "PressCL"
+2. El navegador se abrira automaticamente con la app
+
+CERRAR LA APP
+-------------
+1. Cerrar el navegador (o la pestaña) cierra la app completamente.
+
+============================================

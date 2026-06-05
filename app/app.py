@@ -3,6 +3,8 @@ import csv
 import io
 import os
 import shutil
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, timedelta
 from pathlib import Path
@@ -12,6 +14,40 @@ import streamlit as st
 
 from scraper.outlets import REGISTRY
 from scraper.output import SCHEMA
+
+# ── Auto-shutdown when last browser tab closes ────────────────────────────────
+_monitor_started = False
+
+def _start_shutdown_monitor():
+    global _monitor_started
+    if _monitor_started:
+        return
+    _monitor_started = True
+
+    def _monitor():
+        time.sleep(15)  # grace period for browser to open
+        idle_since = None
+        while True:
+            time.sleep(3)
+            try:
+                from streamlit.runtime import get_instance
+                rt = get_instance()
+                if rt is None:
+                    continue
+                n = len(rt._session_mgr.list_sessions())
+            except Exception:
+                continue
+            if n == 0:
+                if idle_since is None:
+                    idle_since = time.time()
+                elif time.time() - idle_since >= 10:
+                    os._exit(0)
+            else:
+                idle_since = None
+
+    threading.Thread(target=_monitor, daemon=True).start()
+
+_start_shutdown_monitor()
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
