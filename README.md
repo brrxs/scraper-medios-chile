@@ -109,7 +109,7 @@ Cada artículo incluye 8 campos:
 PressCL está diseñado para uso periodístico e investigativo sobre contenido de acceso público.
 
 - Las solicitudes están limitadas a 1,5–3,5 segundos entre páginas por medio.
-- El scraping está limitado a 50 páginas por búsqueda y 100 artículos diarios para Google News.
+- El scraping está limitado a 50 páginas por búsqueda.
 - El usuario es responsable de cumplir con los términos de uso de cada medio.
 - Esta herramienta no sortea paywalls ni accede a contenido restringido.
 
