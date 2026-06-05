@@ -2,6 +2,7 @@ import base64
 import csv
 import io
 import os
+import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, timedelta
 from pathlib import Path
@@ -31,6 +32,9 @@ st.markdown(
         .stTabs [data-baseweb="tab"][aria-selected="true"] { border-bottom-color: #B8541C !important; }
         /* Terracotta links */
         .stMarkdown a { color: #B8541C !important; }
+        /* Compact sidebar */
+        section[data-testid="stSidebar"] > div:first-child { padding-top: 0.75rem !important; }
+        section[data-testid="stSidebar"] .stImage { margin-bottom: 0 !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -49,13 +53,13 @@ with st.sidebar:
         b64 = base64.b64encode(logo_path.read_bytes()).decode()
         st.markdown(
             f'<div style="display:flex;justify-content:center;margin-bottom:0.5rem">'
-            f'<img src="data:image/svg+xml;base64,{b64}" width="150">'
+            f'<img src="data:image/svg+xml;base64,{b64}" width="140">'
             f'</div>',
             unsafe_allow_html=True,
         )
     st.markdown(
         """
-        <div style="line-height:1.2;margin-top:0.25rem">
+        <div style="line-height:1.1;margin-top:0.15rem">
             <span style="font-size:0.85rem">Desarrollado por brrxs.</span><br>
             <span style="font-size:0.75rem"><a href="https://brrxs.github.io"><strong>brrxs.github.io</strong></a></span>
         </div>
@@ -121,6 +125,30 @@ with st.sidebar:
     )
     if since > until:
         st.error("La fecha de inicio debe ser anterior o igual a la fecha de término.")
+
+    st.markdown("<hr style='margin:0.3rem 0'>", unsafe_allow_html=True)
+    with st.expander("Búsquedas anteriores"):
+        datos_path = Path(__file__).parent / "datos"
+        csv_files = list(datos_path.rglob("*.csv")) if datos_path.exists() else []
+        total_mb = sum(f.stat().st_size for f in csv_files) / 1_048_576
+        if csv_files:
+            st.caption(f"{len(csv_files)} archivo(s) guardado(s) · {total_mb:.1f} MB")
+        else:
+            st.caption("No hay búsquedas guardadas.")
+        if st.button(
+            "Limpiar base de datos local",
+            use_container_width=True,
+            help=(
+                "Cada vez que ejecutas una búsqueda, los resultados se guardan "
+                "automáticamente en la carpeta datos/ del proyecto.\n\n"
+                "Este botón elimina todos esos archivos de forma permanente."
+            ),
+        ):
+            if datos_path.exists():
+                for item in datos_path.iterdir():
+                    shutil.rmtree(item) if item.is_dir() else item.unlink()
+            st.success("Base de datos limpiada.")
+            st.rerun()
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 st.title("Scraper de Prensa Chilena")
