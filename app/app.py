@@ -1,3 +1,4 @@
+import base64
 import csv
 import io
 import os
@@ -28,6 +29,8 @@ st.markdown(
         .stDataFrame, button, label, .stMarkdown p { font-family: 'JetBrains Mono', monospace !important; }
         /* Terracotta active tab underline */
         .stTabs [data-baseweb="tab"][aria-selected="true"] { border-bottom-color: #B8541C !important; }
+        /* Terracotta links */
+        .stMarkdown a { color: #B8541C !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -43,20 +46,33 @@ if "run_meta" not in st.session_state:
 with st.sidebar:
     logo_path = Path(__file__).parent / "style-kit" / "assets" / "logo.svg"
     if logo_path.exists():
-        st.image(str(logo_path))
-    st.markdown("**Monitor Social UC**")
+        b64 = base64.b64encode(logo_path.read_bytes()).decode()
+        st.markdown(
+            f'<div style="display:flex;justify-content:center;margin-bottom:0.5rem">'
+            f'<img src="data:image/svg+xml;base64,{b64}" width="150">'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+    st.markdown(
+        """
+        <div style="line-height:1.2;margin-top:0.25rem">
+            <span style="font-size:0.85rem">Desarrollado por brrxs.</span><br>
+            <span style="font-size:0.75rem"><a href="https://brrxs.github.io"><strong>brrxs.github.io</strong></a></span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.divider()
 
-    query_raw = st.text_area(
+    query_raw = st.text_input(
         "Búsqueda",
-        placeholder="ej: reforma pensiones\npobreza vivienda",
+        placeholder="ej: cambio climático, desempleo, reforma pensiones",
         help=(
-            "Una frase por línea.\n"
-            "Dentro de cada línea: TODAS las palabras deben aparecer (AND).\n"
-            "Entre líneas: basta con que aparezca UNA (OR).\n"
-            "Dejar vacío para traer todo lo del período."
+            "Separa términos con comas.\n\n"
+            "· reforma pensiones → busca esa frase exacta\n"
+            "· reforma, pensiones → busca cada término por separado\n\n"
+            "Vacío = trae todo lo del período sin filtro."
         ),
-        height=110,
     )
 
     today = date.today()
@@ -76,15 +92,19 @@ with st.sidebar:
         selected_outlets = st.multiselect(
             "Medios",
             all_slugs,
-            default=all_slugs,
+            default=[],
             placeholder="Elige medios…",
             label_visibility="collapsed",
         )
 
     with st.expander("Opciones avanzadas"):
         n_workers = st.slider(
-            "Procesos en paralelo", 1, 4, 3,
-            help="Cuántos medios se scrapeean al mismo tiempo. Más = más rápido pero más uso de CPU/RAM.",
+            "Procesos en paralelo", 1, 10, 3,
+            help=(
+                "Cuántos medios se scrapeean al mismo tiempo.\n\n"
+                "⚠️ Valores altos (> 6) pueden causar bloqueos por rate-limiting en algunos sitios "
+                "y aumentan significativamente el uso de CPU y RAM."
+            ),
         )
         gn_fulltext = st.checkbox(
             "Google News: recuperar texto completo",
@@ -108,7 +128,7 @@ st.caption(f"{len(REGISTRY)} medios · datos guardados en datos/")
 st.divider()
 
 if run_btn:
-    queries = [q.strip() for q in query_raw.splitlines() if q.strip()]
+    queries = [q.strip() for q in query_raw.split(",") if q.strip()]
     since_d = date(since.year, since.month, since.day)
     until_d = date(until.year, until.month, until.day)
 
@@ -118,16 +138,27 @@ if run_btn:
         del os.environ["GNEWS_FULLTEXT"]
 
     status: dict[str, tuple[str, str]] = {
-        slug: ("⏳ Pendiente", "—") for slug in selected_outlets
+        slug: ("Pendiente", "—") for slug in selected_outlets
     }
 
     st.markdown(f"**Scrapeando {len(selected_outlets)} medio(s)…**")
     progress_bar = st.progress(0.0)
     table_slot = st.empty()
 
+    _STATUS_COLORS = {
+        "Listo":     "color: #5C7A2A",  # olive green — harmonizes with warm palette
+        "Pendiente": "color: #C4900A",  # warm amber
+        "Error":     "color: #8B2500",  # dark terracotta
+    }
+
+    def _color_estado(val):
+        return _STATUS_COLORS.get(val, "")
+
     def _refresh():
         rows = [{"Medio": s, "Estado": e, "Artículos": n} for s, (e, n) in status.items()]
-        table_slot.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+        df = pd.DataFrame(rows)
+        styled = df.style.map(_color_estado, subset=["Estado"])
+        table_slot.dataframe(styled, hide_index=True, use_container_width=True)
 
     _refresh()
 
@@ -146,10 +177,10 @@ if run_btn:
             done += 1
             try:
                 _, arts = future.result()
-                status[slug] = ("✓ Listo", str(len(arts)))
+                status[slug] = ("Listo", str(len(arts)))
                 all_articles.extend(arts)
             except Exception as exc:
-                status[slug] = (f"✗ Error", "0")
+                status[slug] = ("Error", "0")
             progress_bar.progress(done / len(selected_outlets))
             _refresh()
 

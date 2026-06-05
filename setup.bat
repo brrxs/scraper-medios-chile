@@ -4,6 +4,8 @@ echo  Scraper de Prensa Chilena - Configuracion
 echo ============================================
 echo.
 
+cd /d "%~dp0app"
+
 echo [1/3] Creando entorno virtual...
 python -m venv .venv
 if errorlevel 1 (
