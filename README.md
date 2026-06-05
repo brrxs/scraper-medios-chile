@@ -1,102 +1,108 @@
-# PressCL
-
-> **Status:** Personal project, actively used but not actively maintained. Issues welcome; PRs reviewed best-effort. Outlet selectors may break when news sites redesign.
-
-Browser-based app for searching Chilean news archives. Enter a keyword and a date range, pick your outlets, and download a structured dataset — no coding required.
-
-Full usage documentation: [INSTRUCTIONS.md](app/INSTRUCTIONS.md).
+<div align="center">
+  <img src="app/style-kit/assets/logo.svg" alt="PressCL" width="140">
+  <h1>PressCL</h1>
+  <p>Aplicación para buscar noticias en medios chilenos</p>
+</div>
 
 ---
 
-## How it works
+> **Estado:** Proyecto personal, en uso activo pero sin mantenimiento activo. Issues bienvenidos; PRs revisados según disponibilidad. Los selectores de medios pueden romperse cuando los sitios rediseñan su HTML.
 
-You open the app in your browser, type a search query (e.g. `reforma pensiones`), set a date window, and hit run. PressCL searches 15 Chilean news outlets simultaneously and returns a table of articles — headline, body, date, source, URL — ready to download as CSV or Parquet.
+Aplicación web para buscar archivos de noticias chilenas. Ingresa una palabra clave y un rango de fechas, elige tus medios y descarga un dataset estructurado — sin necesidad de programar.
 
-Under the hood it uses each site's native search endpoint where available, and falls back to crawling category feeds with local keyword filtering where it is not.
-
----
-
-## Setup — Windows
-
-**Requirements:** Python 3.10 or higher. Download from [python.org](https://www.python.org/downloads/) and check "Add Python to PATH" during install.
-
-1. Download or clone this repository
-2. Double-click `setup.bat` — wait for it to finish (downloads Chromium, ~300 MB, one time only)
-3. Double-click the **PressCL** shortcut that appears
-4. The app opens in your browser automatically
-
-That's it. No terminal, no commands.
+Documentación completa: [INSTRUCTIONS.md](app/INSTRUCTIONS.md)
 
 ---
 
-## Media coverage
+## Cómo funciona
 
-16 outlets covering the main segments of Chile's national news media landscape.
+Abre la app en el navegador, escribe una consulta (por ejemplo, `reforma pensiones`), define un rango de fechas y presiona ejecutar. PressCL busca simultáneamente en 15 medios chilenos y devuelve una tabla de artículos — título, cuerpo, fecha, fuente, URL — lista para descargar como CSV o Parquet.
 
-| Outlet | URL | Type |
+Internamente, usa el endpoint de búsqueda nativo de cada sitio cuando está disponible, y recurre a crawling de feeds de categorías con filtro local cuando no lo está.
+
+---
+
+## Instalación — Windows
+
+**Requisitos:** Python 3.10 o superior. Descargar desde [python.org](https://www.python.org/downloads/) marcando la opción "Add Python to PATH".
+
+1. Descarga o clona este repositorio
+2. Haz doble clic en `setup.bat` — espera a que termine (descarga Chromium, ~300 MB, solo la primera vez)
+3. Haz doble clic en el acceso directo **PressCL** que aparece
+4. La app se abre automáticamente en el navegador
+
+Sin terminal, sin comandos.
+
+---
+
+## Medios disponibles
+
+16 medios que cubren los principales segmentos del panorama noticioso chileno.
+
+| Medio | URL | Tipo |
 |---|---|---|
 | Biobío Chile | biobiochile.cl | Radio/Digital |
-| CHV Noticias | chilevision.cl | Broadcast (TV) |
-| CIPER Chile | ciperchile.cl | Investigative |
-| CNN Chile | cnnchile.com | Broadcast (TV) |
-| Cooperativa | cooperativa.cl | Radio/digital |
-| El Ciudadano | elciudadano.com | Alternative |
-| El Desconcierto | eldesconcierto.cl | Alternative |
+| CHV Noticias | chilevision.cl | Televisión |
+| CIPER Chile | ciperchile.cl | Investigación |
+| CNN Chile | cnnchile.com | Televisión |
+| Cooperativa | cooperativa.cl | Radio/Digital |
+| El Ciudadano | elciudadano.com | Alternativo |
+| El Desconcierto | eldesconcierto.cl | Alternativo |
 | El Mostrador | elmostrador.cl | Digital |
-| El Siglo | elsiglo.cl | Alternative |
-| Emol | emol.com | Print-digital |
-| La Cuarta | lacuarta.com | Print-digital |
-| La Nación | lanacion.cl | Print-digital |
-| Mega Noticias | meganoticias.cl | Broadcast (TV) |
-| T13 | t13.cl | Broadcast (TV) |
-| 24 Horas | 24horas.cl | Broadcast (TV) |
-| Google News | news.google.com | Search engine |
+| El Siglo | elsiglo.cl | Alternativo |
+| Emol | emol.com | Prensa digital |
+| La Cuarta | lacuarta.com | Prensa digital |
+| La Nación | lanacion.cl | Prensa digital |
+| Mega Noticias | meganoticias.cl | Televisión |
+| T13 | t13.cl | Televisión |
+| 24 Horas | 24horas.cl | Televisión |
+| Google News | news.google.com | Buscador |
 
 ---
 
-## Output
+## Datos de salida
 
-Each article is saved with 8 fields:
+Cada artículo incluye 8 campos:
 
-| Field | Description |
+| Campo | Descripción |
 |---|---|
-| `titulo` | Headline |
-| `cuerpo` | Body text |
-| `bajada` | Subtitle / lead (when available) |
-| `fecha` | Publication date (YYYY-MM-DD) |
-| `fuente` | Outlet |
-| `url` | Article URL |
-| `fecha_scraping` | When the article was collected |
-| `query` | The search query used |
+| `titulo` | Titular |
+| `cuerpo` | Cuerpo del artículo |
+| `bajada` | Bajada / entradilla (cuando está disponible) |
+| `fecha` | Fecha de publicación (YYYY-MM-DD) |
+| `fuente` | Medio |
+| `url` | URL del artículo |
+| `fecha_scraping` | Fecha y hora de recolección |
+| `query` | Consulta utilizada |
 
 ---
 
-## Responsible use
+## Uso responsable
 
-PressCL is designed for research and journalistic use on public news content.
+PressCL está diseñado para uso periodístico e investigativo sobre contenido de acceso público.
 
-- Requests are rate-limited to 1.5–3.5 seconds between pages per outlet.
-- Scraping is capped at 50 pages per search and 100 articles/day for Google News.
-- You are responsible for complying with each outlet's terms of service.
-- This tool does not bypass paywalls or access restricted content.
-
----
-
-## Acknowledgments
-
-- **[datamedios](https://socialtec-cl.github.io/datamedios/)** (socialtec-cl) — R package for Chilean media data. The hidden JSON search APIs used by Biobío and Emol were discovered through its source code.
-- **[prensa_chile](https://github.com/bastianolea/prensa_chile)** (Bastián Olea) — Prior scraper for Chilean press that shaped the outlet selection and overall approach.
-- **[GNews](https://github.com/ranahaani/GNews)** (ranahaani) — Library wrapping Google News RSS. Powers the Google News outlet with Chile/Spanish targeting.
-- **[trafilatura](https://trafilatura.readthedocs.io/en/latest/)** — Article extraction library used to retrieve and clean full article bodies.
+- Las solicitudes están limitadas a 1,5–3,5 segundos entre páginas por medio.
+- El scraping está limitado a 50 páginas por búsqueda y 100 artículos diarios para Google News.
+- El usuario es responsable de cumplir con los términos de uso de cada medio.
+- Esta herramienta no sortea paywalls ni accede a contenido restringido.
 
 ---
 
-## For developers
+## Créditos
 
-If you want to use the CLI, add outlets, or understand the internals, see [INSTRUCTIONS.md](app/INSTRUCTIONS.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+- **[datamedios](https://socialtec-cl.github.io/datamedios/)** (socialtec-cl) — Paquete R para datos de medios chilenos. Las APIs JSON ocultas de Biobío y Emol fueron descubiertas a través de su código fuente.
+- **[prensa_chile](https://github.com/bastianolea/prensa_chile)** (Bastián Olea) — Scraper previo de prensa chilena que definió la selección de medios y el enfoque general.
+- **[GNews](https://github.com/ranahaani/GNews)** (ranahaani) — Librería que envuelve el RSS de Google News. Alimenta el medio `google_news` con targeting Chile/español.
+- **[trafilatura](https://trafilatura.readthedocs.io/en/latest/)** — Librería de extracción de artículos para obtener y limpiar el cuerpo de los textos.
 
 ---
 
-## License
+## Para desarrolladores
+
+Si quieres usar el CLI, agregar medios o entender el código interno, revisa [INSTRUCTIONS.md](app/INSTRUCTIONS.md) y [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## Licencia
 
 [MIT](LICENSE)
