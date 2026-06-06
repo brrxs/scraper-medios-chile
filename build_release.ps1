@@ -10,7 +10,7 @@ $out     = Join-Path $src $zipName
 if (Test-Path $out) { Remove-Item $out -Force }
 
 $excludeDirs  = @('.git', '.venv', '__pycache__', 'datos', 'logs', 'reports', 'analisis')
-$excludeFiles = @($zipName, 'build_release.bat', 'build_release.ps1', 'TODO.md', 'PressCL.lnk', 'Detener Scraper.lnk', 'Abrir Scraper de Prensa.lnk')
+$excludeFiles = @($zipName, 'build_release.bat', 'build_release.ps1', 'TODO.md', 'bug_report.md', 'presscl.gif', 'PressCL.lnk', 'Detener Scraper.lnk', 'Abrir Scraper de Prensa.lnk')
 $excludeExts  = @('.pyc', '.pyo', '.log')
 
 Add-Type -Assembly System.IO.Compression.FileSystem
@@ -24,7 +24,7 @@ Get-ChildItem -Path $src -Recurse -File | Where-Object {
     $isExcludedExt  = $_.Extension -in $excludeExts
     -not ($inExcludedDir -or $isExcludedFile -or $isExcludedExt)
 } | ForEach-Object {
-    $entry = $_.FullName.Substring($src.Length).TrimStart('\', '/')
+    $entry = $_.FullName.Substring($src.Length).TrimStart('\', '/').Replace('\', '/')
     [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $entry) | Out-Null
 }
 

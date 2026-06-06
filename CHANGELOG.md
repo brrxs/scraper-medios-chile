@@ -5,11 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [Unreleased]
+## [0.3] — 2026-06-05
 
 ### Changed
 - `setup.bat` rebranded to PressCL; auto-creates desktop shortcut via PowerShell
 - Streamlit results table now auto-sizes height to show all outlet rows without scrolling
+
+### Fixed
+- `setup.bat` shortcut creation failed at step 4: CMD `^` line-continuation inside the quoted PowerShell `-Command` string was passed literally, aborting the script. Collapsed to a single line and replaced `\"` escaping with `[char]34`.
+- `PressCL.lnk` launched nothing: `launch.vbs` started Streamlit hidden (window style `0`), where its internal `webbrowser.open()` fails silently. Now uses `--server.headless true` and opens the browser from VBS, with a port guard to avoid spawning duplicate instances.
 
 ---
 
@@ -54,6 +58,6 @@ First working release. CLI-only.
 
 ---
 
-[Unreleased]: https://github.com/brrxs/PressCL/compare/v0.2...HEAD
+[0.3]: https://github.com/brrxs/PressCL/compare/v0.2...v0.3
 [0.2]: https://github.com/brrxs/PressCL/compare/v0.1...v0.2
 [0.1]: https://github.com/brrxs/PressCL/releases/tag/v0.1
