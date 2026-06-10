@@ -87,19 +87,38 @@ if "disclaimer_ok" not in st.session_state:
 
 # ── Responsible-use disclaimer ────────────────────────────────────────────────
 if not st.session_state.disclaimer_ok:
-    st.warning("Debes aceptar las condiciones antes de usar la herramienta.")
-    st.markdown("## Uso responsable")
     st.markdown(
         """
-        Esta herramienta extrae contenido de medios de prensa chilenos con fines de
-        **investigación y uso personal**. Al usarla, aceptas:
+        <div style="
+            background-color: rgba(94, 122, 106, 0.15);
+            border-left: 4px solid #5E7A6A;
+            color: #5E7A6A;
+            border-radius: 0.25rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+        ">
+            Antes de continuar, conoce cómo usar PressCL responsablemente.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown("## Buenas prácticas")
+    st.markdown(
+        """
+        **PressCL** incorpora medidas automáticas de uso responsable:
 
-        - Respetar los **términos de uso** de cada medio.
-        - No generar carga excesiva ni automatizar ejecuciones de forma abusiva.
-        - Ser responsable del **uso que hagas de los datos** obtenidos.
-        - No redistribuir el contenido scrapeado sin autorización de cada medio.
+        - **Pausas aleatorias entre solicitudes** para no sobrecargar los servidores.
+        - **Caché permanente**: ningún artículo se descarga dos veces.
+        - **Límite de 3 ejecuciones por hora** de la aplicación completa.
+        - **Respeto de `robots.txt`** en las solicitudes HTML de cada medio.
 
-        El desarrollador no se responsabiliza por el uso indebido de la herramienta.
+        Lo que queda de tu lado:
+
+        - **Distingue análisis de redistribución.** Minería de texto y estudios
+          académicos son distintos de republicar contenido, que sigue protegido
+          por derechos de autor de cada medio.
+        - **Cita la fuente** si publicas resultados: medios y período analizado.
+        - **Considera la Ley 19.628** si tu corpus incluye personas identificables.
         """
     )
     if st.button("Acepto", type="primary", width="stretch"):
